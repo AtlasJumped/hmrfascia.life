@@ -1,6 +1,6 @@
 # hmrfascia.life
 
-The body as a tensegrity with fascia first, condensed from https://universemodel.ai/health.html, health-model.html, and fixing-exercise.html. The simulation is at https://universemodel.ai/simulation.html. This site gives no medical advice.
+The body as a tensegrity with fascia first, condensed from the HMR source pages health-model.html, and fixing-exercise.html. The simulation is at the HMR source pages This site gives no medical advice.
 
 Static site: `index.html`, `css/style.css`, `js/app.js`, `js/hmr-dock.js`, `favicon.svg`. No build step, no external fonts or CDNs.
 
@@ -8,5 +8,5 @@ Static site: `index.html`, `css/style.css`, `js/app.js`, `js/hmr-dock.js`, `favi
 - Design picker (bottom left): three looks and a four-level rating, stored in the browser's localStorage. `?design=1` to `?design=3` picks a look.
 - `js/hmr-dock.js` is the shared bottom dock (Design, Funsies, React). It is copied from hmrfamily.life and replaced when that file is upgraded.
 - Deploy: any static host. `CNAME` is set to `hmrfascia.life`.
-- Content comes only from pages that already exist on https://universemodel.ai and https://claudebomb.com. Claims are labeled as established science, HMR's view, or open.
+- Content comes only from pages that already exist on the HMR source pages and https://claudebomb.com. Claims are labeled as established science, HMR's view, or open.
 - Join us on Discord: https://discord.gg/gEnC8TpNc
