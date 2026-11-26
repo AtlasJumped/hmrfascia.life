@@ -73,3 +73,4 @@ footer{margin-top:48px;padding:32px 0 100px;background:var(--bg2);border-top:1px
 .pk-panel .btn{padding:6px 12px;min-height:40px}
 .pk-msg{font-size:.85rem;color:var(--mute);margin:6px 0 0;min-height:1.2em}
 @media (max-width:480px){body{font-size:16px}.back{margin-left:0}}
+.card ul{margin:.4em 0;padding-left:1.2em}.card li{margin:.3em 0;overflow-wrap:anywhere}
