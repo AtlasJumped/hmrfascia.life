@@ -1,5 +1,16 @@
-/* HMR dock v6.7.2: drag any bar button anywhere (saved per visitor), Funsies lives in the HMR dashboard only, a mic at the top right of every text box.
-   (was HMR dock v6.4.1: one shared bottom bar for all HMR sites.
+/* HMR dock v6.8.2: the HMR joystick (rainbow HMR button with four curved arrows, tap and hold, drags as one), rainbow mic at bottom right, button layouts with a shuffle, wider dashboard and studio.
+   (was HMR dock v6.7.2: drag any bar button anywhere (saved per visitor), Funsies lives in the HMR dashboard only, a mic at the top right of every text box.
+   (was HMR dock v6.6.1: one shared bottom bar for all HMR sites.
+   v6.6.1: the demo cards now show (v6.6.0 skipped every spot because the page's html tag carries hmr- classes).
+   v6.6.0 edit mode: small "Add a demo?" cards with Yes and No at spots that have no demo yet (see the block at the end of this file).
+   (was v6.5.9: one shared bottom bar for all HMR sites.
+   v6.5.9 (Leo's Speak feedback, Nov 24 and 25): the mic starts OFF when the card opens (status "Not recording yet", line "Press the record button and begin speaking");
+     "Talk as long as you like."; the Speak button's label is "Do us a big favor, tell us what you think"; the Speak card can be dragged anywhere by its top line,
+     with a one-time hint ("You can grab this and move it anywhere").
+   v6.5 HMR dash: a round HMR button sits in the center of the bar. It opens the HMR family experience dashboard (hmr-dash.js, loaded from the same folder
+     the first time it is pressed): quick actions, the UI/UX studio (colors, type, comfort, layouts), Improve this site, Funsies and Places.
+     The Design button left the bar; its panel lives on inside the studio's Layouts tab (HMRDock.designPanel). The bar is one grid row:
+     Back, Funsies, HMR (center), Speak, React, Forward.
    v6.4 Design: a seeded generator replaces the fixed list. A design is one integer (the seed): a mulberry32 PRNG picks family (3D or Clean), layout (9), palette (32, all checked to WCAG AA),
      type pairing (14), card style (6), background (5 animated canvas for 3D, 5 static for Clean), density (3), radius (5), accent usage (3). Chips pick 3D, Clean, or All; Shuffle, Back, Forward;
      Save as my view (localStorage per site, applied on the next visit), ?design=<seed> share links, and a per-site HMR default (native page; data-hmr-default overrides).
@@ -60,7 +71,7 @@
   function each(list, f) { return list ? list.split(',').map(function (x) { return f(x.trim()); }).join(',') : ''; }
   var AIMOK = ['html.hmr-aim .hmr-dock *', 'html.hmr-aim .hmr-rxp', 'html.hmr-aim .hmr-rxp *'].concat(ds ? [each(ds, function (x) { return 'html.hmr-aim ' + x; })] : [], ps ? [each(ps, function (x) { return 'html.hmr-aim ' + x; }), each(ps, function (x) { return 'html.hmr-aim ' + x + ' *'; })] : []).join(',');
   var css =
-    'html{--hmr-c:54px;--hmr-cg:8px}@media (max-width:480px){html{--hmr-c:46px;--hmr-cg:4px}}@media (max-width:340px){html{--hmr-c:42px;--hmr-cg:3px}}' +
+    'html{--hmr-c:54px;--hmr-cg:8px}@media (max-width:480px){html{--hmr-c:46px;--hmr-cg:4px}}@media (max-width:374px){html{--hmr-c:42px;--hmr-cg:3px}}' +
     '.hmr-dock{position:fixed;left:0;right:0;bottom:0;height:0;z-index:99990;pointer-events:none;font:600 13px/1.2 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;letter-spacing:0;text-transform:none}' +
     '.hmr-dock *{box-sizing:border-box;font-family:inherit}' +
     '.hmr-rxbtn,.hmr-fzbtn{pointer-events:auto;position:fixed;bottom:' + BASE + ';border:2px solid #fff;color:#fff;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.38);-webkit-tap-highlight-color:transparent;touch-action:manipulation;margin:0;transform:none}' +
@@ -114,7 +125,7 @@
   var styleEl = el('style'); styleEl.id = 'hmr-dock-css'; styleEl.textContent = css.replace('CURSOR', cursorURL()); doc.head.appendChild(styleEl);
 
   styleEl.textContent += [
-    '.hmr-again{pointer-events:auto;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(' + BASE + ' + 58px);max-width:calc(100vw - 24px);background:#111;color:#fff;border:2px solid #fff;border-radius:999px;padding:7px 14px;font:700 13px/1.1 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:34px}',
+    '.hmr-again{pointer-events:auto;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(' + BASE + ' + 66px);max-width:calc(100vw - 24px);background:#111;color:#fff;border:2px solid #fff;border-radius:999px;padding:7px 14px;font:700 13px/1.1 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:34px}',
     '.hmr-again[hidden]{display:none}.hmr-again:hover{background:#1d4ed8}',
     '.hmr-fzm{position:fixed;left:50%;bottom:calc(' + BASE + ' + 64px);transform:translateX(-50%);z-index:99992;width:min(680px,calc(100vw - 24px));max-height:min(80vh,calc(100vh - 110px));overflow:auto;overscroll-behavior:contain;background:#fff;color:#111;border:2px solid #111;border-radius:16px;padding:12px;box-shadow:0 14px 44px rgba(0,0,0,.45);font:500 13px/1.35 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;text-align:left;text-transform:none;letter-spacing:0}',
     '.hmr-fzm[hidden]{display:none}.hmr-fzm *{box-sizing:border-box;font-family:inherit}',
@@ -218,7 +229,7 @@
   }
   function insideDock(t) {
     if (!t || !t.closest) return false;
-    if (t.closest('.hmr-dock,.hmr-rxp,.hmr-mark,.hmr-fzm,.hmr-pov,.hmr-again,.hmr-fbp,.hmr-spk,.hmr-hlm,.hmr-dx,.hmr-toast')) return true;
+    if (t.closest('[data-hmr-ui],.hmr-dock,.hmr-rxp,.hmr-mark,.hmr-fzm,.hmr-pov,.hmr-again,.hmr-fbp,.hmr-spk,.hmr-hlm,.hmr-dx,.hmr-toast')) return true;
     try { if (ds && t.closest(ds)) return true; if (ps && t.closest(ps)) return true; } catch (e) { }
     return false;
   }
@@ -284,6 +295,7 @@
   }
   function openRx() {
     if (!panel) buildPanel();
+    try { if (window.HMRDash) window.HMRDash.closeQuiet(); } catch (e) { }
     stopFunsies(true); closeFz(false); closeSheet(false); closeSpeak(false); hideHlm();
     panel.hidden = false; rxBtn.setAttribute('aria-expanded', 'true');
     var tip = panel.querySelector('#hmr-rxtip');
@@ -390,7 +402,7 @@
     var all = (genRoot() || doc.body).querySelectorAll('h1,h2,h3,h4,h5,h6,p,li,img,svg,button,a,input,textarea,label,figure,td,th,summary,code,pre,blockquote,span,b,strong,em,canvas,video,small,dt,dd,div,select');
     for (var i = 0; i < all.length; i++) {
       var e = all[i];
-      if (e.closest('[data-hmr-dock],.hmr-rxp,.hmr-fzcanvas,.hmr-mark,.hmr-fzm,.hmr-pov,.hmr-again,.hmr-fbp,.hmr-spk,.hmr-hlm,.hmr-dx,.hmr-toast,.hmr-sp') || (e.namespaceURI && e.namespaceURI.indexOf('svg') >= 0 && e.tagName.toLowerCase() !== 'svg')) continue;
+      if (e.closest('[data-hmr-dock],[data-hmr-ui],.hmr-rxp,.hmr-fzcanvas,.hmr-mark,.hmr-fzm,.hmr-pov,.hmr-again,.hmr-fbp,.hmr-spk,.hmr-hlm,.hmr-dx,.hmr-toast,.hmr-sp') || (e.namespaceURI && e.namespaceURI.indexOf('svg') >= 0 && e.tagName.toLowerCase() !== 'svg')) continue;
       var tag = e.tagName, media = /^(IMG|svg|CANVAS|VIDEO|BUTTON|INPUT|TEXTAREA|SELECT)$/i.test(tag);
       if (!media) { var leaf = true; for (var k = 0; k < e.children.length; k++) if (!LEAFOK.test(e.children[k].tagName)) { leaf = false; break; } if (!leaf) continue; if (!(e.textContent || '').trim()) continue; }
       var r = e.getBoundingClientRect();
@@ -1213,6 +1225,7 @@
     if (best) { best.focus(); try { best.scrollIntoView({ block: 'nearest' }); } catch (e2) { } }
   }
   function openFz() {
+    try { if (window.HMRDash) window.HMRDash.closeQuiet(); } catch (e) { }
     stopFunsies(true); hideAgain(); if (panel && !panel.hidden) closeRx(false); closePlay(false); closeSheet(false); closeSpeak(false); hideHlm();
     buildMenu(); fzm.hidden = false; fzBtn.setAttribute('aria-expanded', 'true');
     doc.addEventListener('pointerdown', outside, true);
@@ -1273,7 +1286,7 @@
   function jset(k, v) { return lsSet(k, JSON.stringify(v)); }
   function ldel(k) { try { localStorage.removeItem(k); } catch (e) { } }
   function formKey() { return window.HMR_FORM_KEY || FORM_KEY || ''; }
-  var BAD = '[data-hmr-dock],.hmr-rxp,.hmr-fzm,.hmr-fbp,.hmr-spk,.hmr-hlm,.hmr-pov,.hmr-dx,.hmr-toast,.hmr-gen,textarea,input,select,script,style,[contenteditable="true"]';
+  var BAD = '[data-hmr-dock],[data-hmr-ui],.hmr-rxp,.hmr-fzm,.hmr-fbp,.hmr-spk,.hmr-hlm,.hmr-pov,.hmr-dx,.hmr-toast,.hmr-gen,textarea,input,select,script,style,[contenteditable="true"]';
   function badNode(a) { try { if (a && a.closest) { if (a.closest(BAD)) return true; if (ps && a.closest(ps)) return true; if (ds && a.closest(ds)) return true; } } catch (e) { } return false; }
 
   // ---- Microsoft Clarity (click tracking), once
@@ -1373,9 +1386,19 @@
   // ---- styles for the new parts
   var PILL = 'pointer-events:auto;position:fixed;bottom:' + BASE + ';margin:0 0 4px;height:46px;border:2px solid #fff;border-radius:999px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;padding:0 14px;font-size:14px;font-weight:800;letter-spacing:.01em;white-space:nowrap;box-shadow:0 6px 20px rgba(0,0,0,.38);-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:transform .25s,opacity .2s;transform:none';
   styleEl.textContent += [
-    '.hmr-dock{--hmr-fw:116px;--hmr-nw:56px;--hmr-sw:46px;--hmr-g:6px;--hmr-sh:calc((var(--hmr-g) + var(--hmr-sw)) / -2)}',
-    '@media (max-width:480px){.hmr-dock{--hmr-fw:84px;--hmr-nw:44px;--hmr-sw:44px;--hmr-g:4px}}@media (max-width:340px){.hmr-dock{--hmr-fw:66px;--hmr-nw:36px;--hmr-sw:36px;--hmr-g:3px}.hmr-fzbtn{font-size:13px!important}}',
-    '.hmr-fzbtn{width:var(--hmr-fw)!important;margin-left:calc(var(--hmr-fw) / -2 + var(--hmr-sh))!important}',
+    // v6.5: one grid row. Back, Funsies, spacer, HMR, spacer, Speak, React, Forward. Each button keeps its own look; the grid places it.
+    '.hmr-dock{display:grid!important;grid-template-columns:auto auto minmax(0,1fr) auto minmax(0,1fr) auto auto auto;align-items:center;column-gap:var(--hmr-g);height:auto!important;left:' + LEFT + '!important;right:' + RIGHT + '!important;bottom:' + BASE + '!important}',
+    '.hmr-dock>#hmr-back,.hmr-dock>#hmr-fz,.hmr-dock>.hmr-fzbtn,.hmr-dock>#hmr-hmr,.hmr-dock>#hmr-speak,.hmr-dock>.hmr-rxbtn,.hmr-dock>#hmr-fwd{position:relative!important;left:auto!important;right:auto!important;bottom:auto!important;top:auto!important;margin:0!important}',
+    '.hmr-dock>#hmr-back{grid-column:1}.hmr-dock>.hmr-fzbtn{grid-column:2}.hmr-dock>#hmr-hmr{grid-column:4}.hmr-dock>#hmr-speak{grid-column:6}.hmr-dock>.hmr-rxbtn{grid-column:7}.hmr-dock>#hmr-fwd{grid-column:8}',
+    '.hmr-hmrbtn{pointer-events:auto;width:var(--hmr-hw);height:var(--hmr-hw);padding:0;border-radius:50%;border:2px solid #fff;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;background:conic-gradient(from 210deg,#e0307a,#f59e0b,#06b6d4,#8b5cf6,#e0307a);box-shadow:0 6px 22px rgba(0,0,0,.42),0 0 0 3px rgba(255,255,255,.18);-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:transform .25s}',
+    '.hmr-hmrbtn .hmr-hmrt{display:flex;align-items:center;justify-content:center;width:calc(100% - 8px);height:calc(100% - 8px);border-radius:50%;background:rgba(10,12,24,.55);font:900 13px/1 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;letter-spacing:.06em}',
+    '.hmr-hmrbtn:hover{transform:scale(1.07)}.hmr-hmrbtn:active{transform:scale(.94)}.hmr-hmrbtn[aria-expanded="true"]{box-shadow:0 6px 22px rgba(0,0,0,.42),0 0 0 4px #fff}',
+    '.hmr-hmrbtn.ld .hmr-hmrt{animation:hmrld 1s linear infinite}@keyframes hmrld{50%{opacity:.45}}',
+    '.hmr-hmrbtn:focus-visible{outline:3px solid #f59e0b;outline-offset:3px}',
+    '@media (prefers-reduced-motion:reduce){.hmr-hmrbtn{transition:none}.hmr-hmrbtn:hover{transform:none}.hmr-hmrbtn.ld .hmr-hmrt{animation:none}}',
+    '.hmr-dock{--hmr-hw:58px;--hmr-fw:116px;--hmr-nw:56px;--hmr-sw:46px;--hmr-g:6px;--hmr-sh:calc((var(--hmr-g) + var(--hmr-sw)) / -2)}',
+    '@media (max-width:480px){.hmr-dock{--hmr-hw:52px;--hmr-fw:84px;--hmr-nw:44px;--hmr-sw:44px;--hmr-g:4px}}@media (max-width:374px){.hmr-dock{--hmr-hw:44px;--hmr-fw:66px;--hmr-nw:36px;--hmr-sw:36px;--hmr-g:3px}.hmr-fzbtn{font-size:13px!important}}',
+    '.hmr-fzbtn{width:var(--hmr-fw)!important;margin-left:calc(var(--hmr-fw) / -2 + var(--hmr-sh))!important}.hmr-dock>.hmr-fzbtn{margin:0!important}',
     '.hmr-nv,.hmr-spbtn{' + PILL + '}',
     '.hmr-nv{width:var(--hmr-c);height:var(--hmr-c);padding:0;margin:0;border-radius:50%}.hmr-nv svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}',
     '.hmr-nv.back{left:' + LEFT + ';right:auto;background:linear-gradient(135deg,#06b6d4,#3b82f6)}',
@@ -1492,16 +1515,36 @@
   var ARR = function (d) { return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + d + '"/></svg>'; };
   var backBtn = mkPill('hmr-nv back', 'hmr-back', 'Go back', ARR('M15 5l-7 7 7 7'));
   var fwdBtn = mkPill('hmr-nv fwd', 'hmr-fwd', 'Go forward', ARR('M9 5l7 7-7 7'));
-  var spBtn = mkPill('hmr-spbtn', 'hmr-speak', 'Speak here: say anything and someone will listen', '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></svg>');
-  spBtn.title = 'Speak here'; spBtn.setAttribute('aria-haspopup', 'dialog'); spBtn.setAttribute('aria-expanded', 'false'); spBtn.setAttribute('aria-controls', 'hmr-spk');
+  var spBtn = mkPill('hmr-spbtn', 'hmr-speak', 'Do us a big favor, tell us what you think', '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></svg>');
+  spBtn.title = 'Do us a big favor, tell us what you think'; spBtn.setAttribute('aria-haspopup', 'dialog'); spBtn.setAttribute('aria-expanded', 'false'); spBtn.setAttribute('aria-controls', 'hmr-spk');
   // The Feedback and "I'm lost" pill buttons are no longer in the dock. fbBtn / lostBtn stay as detached stand-ins so the sheet code (and HMRDock.openFeedback / openLost) keeps working.
   var FWDTIP = 'Forward. Our bar has a forward button even on your first visit, because on many sites the next best step is forward.';
   fwdBtn.title = FWDTIP; fwdBtn.setAttribute('aria-description', FWDTIP);
   (function () { var t = el('span', 'ntip', FWDTIP); t.setAttribute('aria-hidden', 'true'); fwdBtn.appendChild(t); })();
   var fbBtn = mkPill('hmr-fbbtn', 'hmr-feedback', 'Feedback', ''), lostBtn = mkPill('hmr-lostbtn', 'hmr-lost', 'I\'m lost', '');
   backBtn.title = 'Back';
+  // v6.5: the HMR button opens the HMR family experience dashboard (hmr-dash.js, same folder as this file, loaded on first press)
+  var hmrBtn = mkPill('hmr-hmrbtn', 'hmr-hmr', 'Open your HMR family experience dashboard', '<span class="hmr-hmrt">HMR</span>');
+  hmrBtn.title = 'Your HMR dashboard'; hmrBtn.setAttribute('aria-haspopup', 'dialog'); hmrBtn.setAttribute('aria-expanded', 'false'); hmrBtn.setAttribute('aria-controls', 'hmr-dash');
+  var DASHSRC = (function () { try { var u = new URL((script && script.src) || '', location.href); u.pathname = u.pathname.replace(/[^\/]*$/, 'hmr-dash.js'); u.search = '?v=6.6.1'; u.hash = ''; return u.toString(); } catch (e) { return ''; } })();
+  var dashState = 0, dashWait = [];   // 0 not loaded, 1 loading, 2 ready, 3 failed
+  function loadDash(cb) {
+    if (window.HMRDash) { dashState = 2; if (cb) cb(); return; }
+    if (cb) dashWait.push(cb); if (dashState === 1) return;
+    if (!DASHSRC) { dashState = 3; dashWait = []; return; }
+    dashState = 1; hmrBtn.classList.add('ld');
+    var sc = el('script'); sc.src = DASHSRC; sc.async = true;
+    sc.onload = function () { hmrBtn.classList.remove('ld'); dashState = window.HMRDash ? 2 : 3; var w = dashWait.splice(0); if (dashState === 2) w.forEach(function (f) { try { f(); } catch (e) { } }); else toast('The dashboard did not load. Check your connection and try again.', null, 5000); };
+    sc.onerror = function () { hmrBtn.classList.remove('ld'); dashState = 0; dashWait = []; toast('The dashboard did not load. Check your connection and try again.', null, 5000); };
+    (doc.head || doc.body).appendChild(sc);
+  }
+  hmrBtn.addEventListener('click', function () { loadDash(function () { window.HMRDash.toggle(); }); });
+  hmrBtn.addEventListener('pointerenter', function () { loadDash(); }, { once: true });
+  // a Log in button in a site's own top bar (data-hmr-login) opens the dashboard's Log in view
+  doc.addEventListener('click', function (e) { var t = e.target && e.target.closest ? e.target.closest('[data-hmr-login]') : null; if (!t) return; e.preventDefault(); loadDash(function () { window.HMRDash.open('login'); }); });
+  try { if (localStorage.getItem('hmr-studio-v1') || /[?&]hmrlook=/.test(location.search)) { if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', function () { loadDash(); }); else loadDash(); } } catch (e) { }
   dock.textContent = '';
-  [backBtn, fzBtn, spBtn, rxBtn, fwdBtn, again].forEach(function (b) { dock.appendChild(b); });
+  [backBtn, fzBtn, hmrBtn, spBtn, rxBtn, fwdBtn, again].forEach(function (b) { dock.appendChild(b); });
   function navState() { var off = (history.length < 2); backBtn.classList.toggle('off', off); backBtn.setAttribute('aria-disabled', off ? 'true' : 'false'); fwdBtn.classList.remove('off'); fwdBtn.setAttribute('aria-disabled', 'false'); }   // forward is never greyed out: the browser will not say whether a page is ahead
   // v6.2: a page opened in a new tab keeps its entry referrer for the tab's life, so Back can return there when browser history cannot go back
   var ENTRY_REF = '';
@@ -1529,7 +1572,7 @@
     try {
       if (!doc.body) return;
       if (dock.parentNode !== doc.body) { dock.id = 'hmr-dock'; doc.body.appendChild(dock); }
-      [backBtn, fzBtn, spBtn, rxBtn, fwdBtn, again].forEach(function (b) { if (b.parentNode !== dock) dock.appendChild(b); });
+      [backBtn, fzBtn, hmrBtn, spBtn, rxBtn, fwdBtn, again].forEach(function (b) { if (b.parentNode !== dock && !(b.parentNode && b.parentNode.parentNode === dock)) dock.appendChild(b); });
       if (!styleEl.parentNode) doc.head.appendChild(styleEl);
       navState();
     } catch (e) { }
@@ -1658,6 +1701,7 @@
   fbBtn.addEventListener('click', function () { if (fb && !fb.el.hidden && fbMode === 'feedback') closeSheet(true); else openSheet('feedback'); });
   lostBtn.addEventListener('click', function () { if (fb && !fb.el.hidden && fbMode === 'lost') closeSheet(true); else openSheet('lost'); });
   function closeOthers(keep) {
+    if (keep !== 'dash') { try { if (window.HMRDash) window.HMRDash.closeQuiet(); } catch (e) { } }
     if (keep !== 'ds') { try { closeOwn(false); } catch (e) { } }
     if (keep !== 'sheet') closeSheet(false);
     if (keep !== 'sp') closeSpeak(false, false);
@@ -1683,7 +1727,8 @@
   function spShow() {
     var on = !!sp.want;
     sp.dot.classList.toggle('on', on); sp.ctl.classList.toggle('rec', on); sp.ctl.setAttribute('aria-pressed', on ? 'true' : 'false'); sp.ctl.innerHTML = MICSVG(on); sp.ctl.setAttribute('aria-label', on ? 'Stop recording' : 'Start recording'); sp.ctl.title = on ? 'Stop recording' : 'Start recording';
-    sp.state.textContent = on ? 'Recording' : (sp.el0 > 0 ? 'Paused' : 'Ready');
+    sp.state.textContent = on ? 'Recording' : (sp.el0 > 0 ? 'Paused' : 'Not recording yet');
+    if (sp.go) sp.go.hidden = on || sp.el0 > 0 || !SR;
     sp.tm.textContent = fmtT(sp.el0);
     spBtn.classList.toggle('rec', on);
   }
@@ -1753,6 +1798,32 @@
     }
   }
   function spPause() { if (!sp) return; sp.want = false; var r = sp.rec; try { if (r) r.stop(); } catch (e) { } spShow(); }
+  // v6.5.9: drag the Speak card anywhere by its top line (mouse or finger). The spot is kept for this page view.
+  var SPDRAG = 'hmr-spk-drag-hint';
+  function spDraggable(card, handle) {
+    handle.classList.add('hs-grab'); handle.title = 'Drag to move';
+    var st = null;
+    handle.addEventListener('pointerdown', function (e) {
+      if (e.button > 0 || (e.target.closest && e.target.closest('button'))) return;
+      var r = card.getBoundingClientRect(); st = { x: e.clientX, y: e.clientY, l: r.left, t: r.top, w: r.width, on: false, id: e.pointerId };
+    });
+    handle.addEventListener('pointermove', function (e) {
+      if (!st || e.pointerId !== st.id) return;
+      var dx = e.clientX - st.x, dy = e.clientY - st.y;
+      if (!st.on) { if (Math.abs(dx) + Math.abs(dy) < 5) return; st.on = true; try { handle.setPointerCapture(e.pointerId); } catch (er) { } card.classList.add('hs-moved'); lsSet(SPDRAG, '1'); var h = card.querySelector('.hs-dhint'); if (h) h.parentNode.removeChild(h); }
+      var W = window.innerWidth, H = window.innerHeight, ch = card.offsetHeight;
+      var l = Math.max(4, Math.min(W - st.w - 4, st.l + dx)), t = Math.max(4, Math.min(H - Math.min(ch, H - 8) - 4, st.t + dy));
+      var cs = card.style; cs.setProperty('left', l + 'px', 'important'); cs.setProperty('top', t + 'px', 'important'); cs.setProperty('bottom', 'auto', 'important'); cs.setProperty('right', 'auto', 'important'); cs.setProperty('transform', 'none', 'important'); cs.setProperty('width', st.w + 'px', 'important');
+      e.preventDefault();
+    });
+    function end(e) { if (st && st.on) { try { handle.releasePointerCapture(e.pointerId); } catch (er) { } } st = null; }
+    handle.addEventListener('pointerup', end); handle.addEventListener('pointercancel', end);
+  }
+  function spDragHint() {
+    if (!sp || lsGet(SPDRAG) === '1' || sp.el.querySelector('.hs-dhint')) return;
+    var h = el('p', 'hs-dhint', 'You can grab this and move it anywhere: drag the top line.'), hd = sp.el.querySelector('.hd');
+    if (hd && hd.nextSibling) sp.el.insertBefore(h, hd.nextSibling); else sp.el.appendChild(h);
+  }
   function buildSpeak() {
     sp = { want: false, committed: '', sess: '', raw: '', ign: '', rec: null, fails: 0, quick: 0, el0: 0, last: Date.now(), startedAt: 0 };
     var s = el('div', 'hmr-spk'); s.id = 'hmr-spk'; s.hidden = true; s.setAttribute('role', 'dialog'); s.setAttribute('aria-label', 'Speak here'); sp.el = s;
@@ -1762,7 +1833,7 @@
     hd.appendChild(x); s.appendChild(hd);
     // small status row: red dot, timer, state
     var rw = el('div', 'hs-row');
-    sp.dot = el('span', 'hs-dot'); sp.dot.setAttribute('aria-hidden', 'true'); sp.tm = el('span', 'hs-tm', '0:00'); sp.state = el('span', 'hs-state', 'Ready');
+    sp.dot = el('span', 'hs-dot'); sp.dot.setAttribute('aria-hidden', 'true'); sp.tm = el('span', 'hs-tm', '0:00'); sp.state = el('span', 'hs-state', 'Not recording yet');
     rw.appendChild(sp.dot); rw.appendChild(sp.tm); rw.appendChild(sp.state); s.appendChild(rw);
     // the explainer, with its own small x ("Don't show again")
     if (lsGet(SPWHY) !== '1') {
@@ -1771,7 +1842,9 @@
       wx.addEventListener('click', function () { lsSet(SPWHY, '1'); if (why.parentNode) why.parentNode.removeChild(why); });
       why.appendChild(wx); s.appendChild(why);
     }
+    s.appendChild(el('p', 'hs-long', 'Talk as long as you like.'));
     sp.help = el('div', 'hs-help'); sp.help.hidden = true; s.appendChild(sp.help);
+    sp.go = el('p', 'hs-go', 'Press the record button and begin speaking'); s.appendChild(sp.go);
     sp.live = el('div', 'hs-live'); sp.ta = el('textarea'); sp.ta.id = 'hmr-sp-text'; sp.ta.rows = 2; sp.ta.setAttribute('autocomplete', 'off'); sp.ta.setAttribute('aria-label', 'What we heard. You can edit it.'); sp.ta.placeholder = SR ? 'Your words show up here as you talk' : 'Type here';
     var tw = el('div', 'hmr-tw'); tw.appendChild(sp.ta);
     sp.ctl = el('button', 'hmr-tmic'); sp.ctl.type = 'button'; sp.ctl.innerHTML = MICSVG(false); sp.ctl.setAttribute('aria-label', 'Start recording'); sp.ctl.title = 'Start recording'; tw.appendChild(sp.ctl);
@@ -1791,6 +1864,7 @@
     if (!SR) { sp.dot.hidden = sp.tm.hidden = sp.ctl.hidden = true; sp.state.textContent = 'Speak here'; sp.state.hidden = false; }
     sp.timer = setInterval(spTick, 250);
     doc.body.appendChild(s);
+    spDraggable(s, hd);
   }
   // fromTap is true only when the Speak button was pressed: recording starts inside that tap, because phones only allow the microphone after a user gesture
   function openSpeak(fromTap) {
@@ -1801,7 +1875,9 @@
     sp.sub.say(d.t && sp.el.hidden ? 'Your unsent words from last time are here.' : '');
     sp.el.hidden = false; spBtn.setAttribute('aria-expanded', 'true'); spShow();
     if (!SR) { spSay(SPNOSR); if (!TOUCH) { try { sp.ta.focus({ preventScroll: true }); } catch (e) { } } return; }
-    if (fromTap === true && !sp.want) spStart(); else if (!sp.want) spSay('Press the mic in the box to start recording.');
+    // v6.5.9: never starts on its own; the visitor presses the record button in the box (also a user gesture, so phones allow it)
+    if (!sp.want) spSay('');
+    spDragHint();
   }
   // an outside tap never closes this: the page stays usable (scroll, tap) while it records. The X, Escape, or the Speak button itself (force) close it. Other dock buttons leave a recording alone.
   function closeSpeak(back, force) {
@@ -1827,7 +1903,7 @@
   var HLKEY = 'hmr-hl-v1:' + location.pathname, HLSEEN = 'hmr-hl-seen', hlm = null, hlActive = null, mouseDown = false, selT = 0, hlRaf = 0;
   function hlHash(t, n) { var h = 5381, s = t + '|' + n; for (var i = 0; i < s.length; i++) h = ((h * 33) ^ s.charCodeAt(i)) >>> 0; return h.toString(36); }
   function flatText() {
-    var tw = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT, { acceptNode: function (n) { var p = n.parentNode; if (!p || /^(SCRIPT|STYLE|NOSCRIPT|TEXTAREA)$/.test(p.nodeName)) return NodeFilter.FILTER_REJECT; if (p.closest && p.closest('[data-hmr-dock],.hmr-rxp,.hmr-fzm,.hmr-fbp,.hmr-spk,.hmr-hlm,.hmr-pov,.hmr-dx,.hmr-toast,.hmr-gen')) return NodeFilter.FILTER_REJECT; return NodeFilter.FILTER_ACCEPT; } });
+    var tw = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT, { acceptNode: function (n) { var p = n.parentNode; if (!p || /^(SCRIPT|STYLE|NOSCRIPT|TEXTAREA)$/.test(p.nodeName)) return NodeFilter.FILTER_REJECT; if (p.closest && p.closest('[data-hmr-dock],[data-hmr-ui],.hmr-rxp,.hmr-fzm,.hmr-fbp,.hmr-spk,.hmr-hlm,.hmr-pov,.hmr-dx,.hmr-toast,.hmr-gen')) return NodeFilter.FILTER_REJECT; return NodeFilter.FILTER_ACCEPT; } });
     var s = '', map = [], last = ' ', n;
     while ((n = tw.nextNode())) {
       var v = n.nodeValue;
@@ -1849,7 +1925,7 @@
     var plan = nodes.map(function (nd) { return { nd: nd, s: nd === r.startContainer ? r.startOffset : 0, e: nd === r.endContainer ? r.endOffset : nd.nodeValue.length }; });   // offsets read before any split, so the last letter is never lost
     plan.forEach(function (q) {
       var nd = q.nd, s = q.s, e = q.e;
-      if (nd.parentNode && nd.parentNode.closest && nd.parentNode.closest('[data-hmr-dock],.hmr-fbp,.hmr-spk,.hmr-hlm,.hmr-dx,.hmr-gen')) return;
+      if (nd.parentNode && nd.parentNode.closest && nd.parentNode.closest('[data-hmr-dock],[data-hmr-ui],.hmr-fbp,.hmr-spk,.hmr-hlm,.hmr-dx,.hmr-gen')) return;
       if (e <= s || !nd.nodeValue.slice(s, e).trim()) return;
       var mid = nd; if (s > 0) mid = nd.splitText(s); if (e - s < mid.nodeValue.length) mid.splitText(e - s);
       var m = el('mark', 'hmr-hl'); m.setAttribute('data-hl', id); mid.parentNode.insertBefore(m, mid); m.appendChild(mid);
@@ -2075,7 +2151,7 @@
 
   // Which elements the rebuild skips: the dock, its panels, the site's own Design button and panel, and the rebuilt page itself
   function okSel(s) { try { doc.createDocumentFragment().querySelector(s); return true; } catch (e) { return false; } }
-  var EXLIST = ['[data-hmr-dock]', '.hmr-rxp', '.hmr-fzm', '.hmr-fbp', '.hmr-spk', '.hmr-hlm', '.hmr-pov', '.hmr-dx', '.hmr-dsp', '.hmr-toast', '.hmr-again', '.hmr-mark', '.hmr-fzcanvas', '.hmr-sp', '.hmr-spacer', '.hmr-gen', '[data-hmr-tier-ribbon]'];
+  var EXLIST = ['[data-hmr-dock]', '[data-hmr-ui]', '.hmr-rxp', '.hmr-fzm', '.hmr-fbp', '.hmr-spk', '.hmr-hlm', '.hmr-pov', '.hmr-dx', '.hmr-dsp', '.hmr-toast', '.hmr-again', '.hmr-mark', '.hmr-fzcanvas', '.hmr-sp', '.hmr-spacer', '.hmr-gen', '[data-hmr-tier-ribbon]'];
   [ds, ps].forEach(function (l) { if (l) l.split(',').forEach(function (s) { s = s.trim(); if (s && okSel(s) && EXLIST.indexOf(s) < 0) EXLIST.push(s); }); });
   var XSEL = EXLIST.join(',');
   var ANIMKF = {
@@ -2800,6 +2876,7 @@
   // The dock's own Design button and panel: the only design feature on every site (a page's own are hidden by the HIDESEL rule below)
   var own = null;
   function dsInset() {
+    if (root.classList.contains('hmr-studio-on') && (!own || own.panel.hidden)) return;   // v6.5: the HMR dash studio owns the inset while it is open
     var h = 0; try { if (own && !own.panel.hidden) { var r = own.panel.getBoundingClientRect(); h = Math.max(0, Math.ceil(innerHeight - r.top + 6)); } } catch (e) { }
     root.style.setProperty('--hmr-dsinset', h + 'px');
   }
@@ -2826,12 +2903,12 @@
     var x = el('button', 'x', '×'); x.type = 'button'; x.setAttribute('aria-label', 'Close Design'); x.addEventListener('click', function () { closeOwn(true); });
     p.appendChild(buildDx(x));
     b.addEventListener('click', function () { if (own.panel.hidden) openOwn(); else closeOwn(true); });
-    doc.body.appendChild(b); doc.body.appendChild(p); own = { btn: b, panel: p };
+    doc.body.appendChild(p); own = { btn: b, panel: p };   // v6.5: the Design button is not on the bar; design lives in the HMR dash studio (Layouts)
   }
   function ensureDx() {
     if (!doc.body) return;
     if (!own) { try { buildOwn(); } catch (e) { try { console.warn('hmr-dock design', e); } catch (e2) { } } }
-    else { if (own.btn.parentNode !== doc.body) doc.body.appendChild(own.btn); if (own.panel.parentNode !== doc.body) doc.body.appendChild(own.panel); }
+    else { if (own.panel.parentNode !== doc.body) doc.body.appendChild(own.panel); }
   }
   function watchDx() { ensureDx(); }
   dx.th = bootId();
@@ -2865,6 +2942,9 @@
     '.hmr-spk .hs-why2{position:relative;margin:2px 0 6px;padding:6px 8px;border-radius:8px;background:#f1f5ff;font-size:12.5px;line-height:1.35;color:#222}.hmr-spk .hs-why2 p{margin:0 0 4px}.hmr-spk .hs-wx{min-height:32px;padding:0 8px;border:1px solid #9aa4b5;border-radius:999px;background:#fff;color:#222;font-size:12px;font-weight:700;cursor:pointer;touch-action:manipulation}' +
     '.hmr-spk .hs-live .hmr-tw textarea{padding:6px 46px 6px 8px!important}.hmr-spk .hs-live .hmr-tmic{right:8px;bottom:8px;width:36px;height:36px}' +
     '.hmr-spk .hs-tip{margin:4px 0 0;font-size:11.5px;line-height:1.3;color:#444}' +
+    '.hmr-spk .hs-long{margin:2px 0 4px;font-size:13px;font-weight:700}.hmr-spk .hs-go{margin:2px 0 4px;font-size:13px;font-weight:700;color:#b91c1c}.hmr-spk .hs-go[hidden]{display:none}' +
+    '.hmr-spk .hd.hs-grab{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}.hmr-spk.hs-moved .hd.hs-grab:active{cursor:grabbing}' +
+    '.hmr-spk .hs-dhint{margin:0 0 4px;padding:4px 8px;border-radius:8px;background:#fff7d6;border:1px solid #f0c94a;font-size:12px;color:#222}' +
     '.hmr-spk .hd{display:flex;align-items:center;gap:8px;margin:0 0 4px;white-space:nowrap;font-size:13px;font-weight:700}.hmr-spk .hs-sp{flex:1}' +
     '.hmr-spk .hs-dot{flex:none;width:12px;height:12px;border-radius:50%;background:#9ca3af}.hmr-spk .hs-dot.on{background:#dc2626;animation:hmr-spkpulse 1.1s ease-in-out infinite}' +
     '@keyframes hmr-spkpulse{50%{opacity:.35}}@media (prefers-reduced-motion:reduce){.hmr-spk .hs-dot.on{animation:none}}' +
@@ -2971,13 +3051,13 @@
   //   Speech goes only into that box. Skipped: password, number, date, color, range, checkboxes, dropdowns, read-only or disabled boxes,
   //   boxes that already have a mic, and anything marked data-hmr-nomic.
   (function () {
-    var POSKEY = 'hmr-btnpos-v1', IDS = ['hmr-back', 'hmr-hmr', 'hmr-speak', 'hmr-react', 'hmr-fwd'];
+    var POSKEY = 'hmr-btnpos-v1', IDS = ['hmr-back', 'hmr-pad', 'hmr-speak', 'hmr-react', 'hmr-fwd'];
     function lsg() { try { return JSON.parse(localStorage.getItem(POSKEY) || '{}') || {}; } catch (e) { return {}; } }
     function lss(o) { try { if (Object.keys(o).length) localStorage.setItem(POSKEY, JSON.stringify(o)); else localStorage.removeItem(POSKEY); } catch (e) { } }
     var css = doc.createElement('style'); css.id = 'hmr-v67-css';
     css.textContent = [
       'html.hmr-has-hmr .hmr-dock>.hmr-fzbtn,html.hmr-has-hmr #hmr-funsies{display:none!important}',
-      '.hmr-dock>#hmr-back,.hmr-dock>#hmr-hmr,.hmr-dock>#hmr-speak,.hmr-dock>#hmr-react,.hmr-dock>#hmr-fwd{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}',
+      '.hmr-dock>#hmr-back,.hmr-dock>#hmr-pad,.hmr-dock>#hmr-pad #hmr-hmr,.hmr-dock>#hmr-speak,.hmr-dock>#hmr-react,.hmr-dock>#hmr-fwd{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}',
       '.hmr-dock>.hmr-moved{position:fixed!important;margin:0!important;right:auto!important;bottom:auto!important;z-index:99991}',
       '.hmr-dock>.hmr-dragging{cursor:grabbing!important;transition:none!important;transform:none!important;box-shadow:0 0 0 4px #fff,0 12px 34px rgba(0,0,0,.55)!important}',
       '.hmr-mw{position:relative!important;max-width:100%}',
@@ -3046,7 +3126,7 @@
     // the click that ends a drag is not a tap
     window.addEventListener('click', function (e) {
       if (Date.now() - swallow > 400) return;
-      var t = e.target && e.target.closest ? e.target.closest('.hmr-dock>button,.hmr-dock>a') : null;
+      var t = e.target && e.target.closest ? e.target.closest('.hmr-dock>button,.hmr-dock>a,.hmr-dock>.hmr-pad') : null;
       if (t) { swallow = 0; e.preventDefault(); e.stopImmediatePropagation(); }
     }, true);
     window.addEventListener('resize', function () { applySaved(); });
@@ -3142,12 +3222,329 @@
     window.__hmrResetButtons = resetButtons;
   })();
 
+
+  // ------------------------------------------------------------------ v6.8 (Leo, Nov 26): the HMR joystick, a rainbow mic at bottom right, layouts with a shuffle, wider panels
+  // HMR joystick: the round rainbow HMR button sits in the middle of four arrows. Each arrow is a triangle whose curved base hugs the HMR circle
+  //   (the shape you get from four circles set around the HMR button: the space between them is the arrow).
+  //   Up:    tap jumps to the top (with "Jump back" for a few seconds), hold scrolls up.
+  //   Down:  tap jumps to the bottom (with "Jump back"), hold scrolls down.
+  //   Left:  tap goes to the previous section of the page, hold keeps stepping back.
+  //   Right: tap goes to the next section, hold keeps stepping forward.
+  //   Tap HMR opens the dashboard, as before. Press HMR and move it to drag the whole joystick anywhere (saved like the other buttons).
+  // Mic (feedback): bottom right, the same size as the forward button, rainbow like the HMR button.
+  // Layouts (localStorage 'hmr-layout-v1'): Joystick (default), Right thumb, Left thumb, Reader, Classic.
+  //   "Shuffle the buttons" (in the dashboard, Right now row and Your settings) moves to the next layout and puts any dragged buttons back.
+  // Wider panels: the dashboard is up to 680px wide and the UI/UX studio up to 1040px on wide screens (phones already use the full width).
+  (function () {
+    if (typeof hmrBtn === 'undefined' || !hmrBtn) return;
+    var LKEY = 'hmr-layout-v1';
+    var LAYS = [
+      { id: 'joy', name: 'Joystick', hint: 'HMR joystick in the middle, mic at bottom right' },
+      { id: 'rt', name: 'Right thumb', hint: 'Everything near your right thumb' },
+      { id: 'lt', name: 'Left thumb', hint: 'Everything near your left thumb' },
+      { id: 'read', name: 'Reader', hint: 'Only the joystick and the mic' },
+      { id: 'classic', name: 'Classic', hint: 'The old row: plain HMR button, no arrows' }
+    ];
+    function lget() { try { var v = localStorage.getItem(LKEY) || 'joy'; for (var i = 0; i < LAYS.length; i++) if (LAYS[i].id === v) return v; } catch (e) { } return 'joy'; }
+    function lset(v) { try { if (v === 'joy') localStorage.removeItem(LKEY); else localStorage.setItem(LKEY, v); } catch (e) { } }
+    function lay(id) { for (var i = 0; i < LAYS.length; i++) if (LAYS[i].id === id) return LAYS[i]; return LAYS[0]; }
+    var cur = lget();
+    function setCls() { LAYS.forEach(function (l) { root.classList.toggle('hmr-lay-' + l.id, l.id === cur); }); }
+    setCls();
+
+    // ---- the arrow shape, in a 100 x 100 box centred on 0,0 (up arrow; the others are turned)
+    var R1 = 31, RA = 50, RC = 44, S = Math.sin(40 * Math.PI / 180) * R1, C = Math.cos(40 * Math.PI / 180) * R1;
+    var PATH = 'M' + (-S).toFixed(2) + ' ' + (-C).toFixed(2) + 'A' + R1 + ' ' + R1 + ' 0 0 1 ' + S.toFixed(2) + ' ' + (-C).toFixed(2) +
+      'A' + RC + ' ' + RC + ' 0 0 1 0 ' + (-RA) + 'A' + RC + ' ' + RC + ' 0 0 1 ' + (-S).toFixed(2) + ' ' + (-C).toFixed(2) + 'Z';
+    var DIRS = [
+      { d: 'up', rot: 0, c: ['#e0307a', '#f59e0b'], label: 'Up: tap to jump to the top, hold to scroll up' },
+      { d: 'right', rot: 90, c: ['#f59e0b', '#22c55e'], label: 'Right: tap for the next section, hold to keep going' },
+      { d: 'down', rot: 180, c: ['#06b6d4', '#3b82f6'], label: 'Down: tap to jump to the bottom, hold to scroll down' },
+      { d: 'left', rot: 270, c: ['#8b5cf6', '#e0307a'], label: 'Left: tap for the previous section, hold to keep going' }
+    ];
+    var pad = el('div', 'hmr-pad'); pad.id = 'hmr-pad'; pad.setAttribute('role', 'group'); pad.setAttribute('aria-label', 'HMR joystick');
+    DIRS.forEach(function (o, i) {
+      var b = el('button', 'hmr-pa'); b.type = 'button'; b.setAttribute('data-d', o.d); b.setAttribute('aria-label', o.label); b.title = o.label;
+      b.innerHTML = '<svg viewBox="-50 -50 100 100" aria-hidden="true" focusable="false"><defs><linearGradient id="hmrpg' + i + '" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="' + o.c[0] + '"/><stop offset="1" stop-color="' + o.c[1] + '"/></linearGradient></defs>' +
+        '<path d="' + PATH + '" transform="rotate(' + o.rot + ')" fill="url(#hmrpg' + i + ')"/></svg>';
+      pad.appendChild(b); o.b = b;
+    });
+    var undo = el('button', 'hmr-padundo', 'Jump back'); undo.type = 'button'; undo.hidden = true; pad.appendChild(undo);
+
+    var css = el('style'); css.id = 'hmr-v68-css';
+    css.textContent = [
+      '.hmr-dock{--hmr-pw:116px}@media (max-width:480px){.hmr-dock{--hmr-pw:104px}}@media (max-width:374px){.hmr-dock{--hmr-pw:90px}}',
+      // the row: Back, React | joystick | Forward, Mic
+      'html.hmr-lay-joy .hmr-dock,html.hmr-lay-read .hmr-dock{grid-template-columns:auto auto minmax(0,1fr) auto minmax(0,1fr) auto auto!important}',
+      'html.hmr-lay-joy .hmr-dock>#hmr-back{grid-column:1}html.hmr-lay-joy .hmr-dock>.hmr-rxbtn{grid-column:2}html.hmr-lay-joy .hmr-dock>.hmr-fzbtn{grid-column:2}html.hmr-lay-joy .hmr-dock>#hmr-pad{grid-column:4}html.hmr-lay-joy .hmr-dock>#hmr-fwd{grid-column:6}html.hmr-lay-joy .hmr-dock>#hmr-speak{grid-column:7}',
+      'html.hmr-lay-read .hmr-dock>#hmr-back,html.hmr-lay-read .hmr-dock>.hmr-rxbtn,html.hmr-lay-read .hmr-dock>#hmr-fwd{display:none!important}html.hmr-lay-read .hmr-dock>#hmr-pad{grid-column:4}html.hmr-lay-read .hmr-dock>#hmr-speak{grid-column:7}',
+      // right thumb: [space] Back React Forward Mic Joystick
+      'html.hmr-lay-rt .hmr-dock{grid-template-columns:minmax(0,1fr) auto auto auto auto auto!important}html.hmr-lay-rt .hmr-dock>#hmr-back{grid-column:2}html.hmr-lay-rt .hmr-dock>.hmr-rxbtn,html.hmr-lay-rt .hmr-dock>.hmr-fzbtn{grid-column:3}html.hmr-lay-rt .hmr-dock>#hmr-fwd{grid-column:4}html.hmr-lay-rt .hmr-dock>#hmr-speak{grid-column:5}html.hmr-lay-rt .hmr-dock>#hmr-pad{grid-column:6}',
+      // left thumb: Joystick Mic Back React Forward [space]
+      'html.hmr-lay-lt .hmr-dock{grid-template-columns:auto auto auto auto auto minmax(0,1fr)!important}html.hmr-lay-lt .hmr-dock>#hmr-pad{grid-column:1}html.hmr-lay-lt .hmr-dock>#hmr-speak{grid-column:2}html.hmr-lay-lt .hmr-dock>#hmr-back{grid-column:3}html.hmr-lay-lt .hmr-dock>.hmr-rxbtn,html.hmr-lay-lt .hmr-dock>.hmr-fzbtn{grid-column:4}html.hmr-lay-lt .hmr-dock>#hmr-fwd{grid-column:5}',
+      // classic: the v6.5 row, plain HMR button
+      'html.hmr-lay-classic .hmr-dock>#hmr-pad{grid-column:4}html.hmr-lay-classic .hmr-pa{display:none!important}html.hmr-lay-classic .hmr-dock{--hmr-pw:var(--hmr-hw)}',
+      '.hmr-dock>#hmr-back,.hmr-dock>.hmr-fzbtn,.hmr-dock>#hmr-pad,.hmr-dock>#hmr-speak,.hmr-dock>.hmr-rxbtn,.hmr-dock>#hmr-fwd{grid-row:1}',
+      '.hmr-dock>#hmr-pad{position:relative!important;left:auto;right:auto;bottom:auto;top:auto;margin:0!important}',
+      '.hmr-pad{pointer-events:none;width:var(--hmr-pw);height:var(--hmr-pw);touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}',
+      '.hmr-pad>#hmr-hmr{position:absolute!important;left:50%!important;top:50%!important;right:auto!important;bottom:auto!important;margin:calc(var(--hmr-hw) / -2) 0 0 calc(var(--hmr-hw) / -2)!important;z-index:2}',
+      '.hmr-pa{position:absolute;inset:0;width:100%;height:100%;padding:0;margin:0;border:0;background:none!important;box-shadow:none;pointer-events:none;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:none;outline:none}',
+      '.hmr-pa svg{display:block;width:100%;height:100%;overflow:visible;filter:drop-shadow(0 3px 6px rgba(0,0,0,.35))}',
+      '.hmr-pa path{pointer-events:visiblePainted;stroke:#fff;stroke-width:2.2;stroke-linejoin:round;transition:filter .15s}',
+      '.hmr-pa:hover path{filter:brightness(1.15)}.hmr-pa.on path{filter:brightness(1.3);stroke-width:3}',
+      '.hmr-pa:focus-visible path{stroke:#f59e0b;stroke-width:4}',
+      '.hmr-padundo{position:absolute;left:50%;bottom:calc(100% + 6px);transform:translateX(-50%);pointer-events:auto;white-space:nowrap;padding:6px 12px;border-radius:999px;border:2px solid #fff;background:#111;color:#fff;font:700 13px/1.2 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.4)}.hmr-padundo[hidden]{display:none!important}',
+      // mic: the forward button's size, rainbow like HMR
+      '.hmr-dock>#hmr-speak{width:var(--hmr-c)!important;height:var(--hmr-c)!important;background:conic-gradient(from 210deg,#e0307a,#f59e0b,#22c55e,#06b6d4,#8b5cf6,#e0307a)!important}.hmr-dock>#hmr-speak svg{width:24px;height:24px}',
+      '.hmr-dock>#hmr-speak[aria-expanded="true"]{background:linear-gradient(135deg,#dc2626,#7f1d1d)!important}',
+      // panels open above the taller joystick
+      'html:not(.hmr-lay-classic) .hmr-fbp,html:not(.hmr-lay-classic) .hmr-spk,html:not(.hmr-lay-classic) .hmr-fzm{bottom:calc(' + BASE + ' + var(--hmr-pw) + 8px)!important}',
+      'html:not(.hmr-lay-classic) .hmr-spacer{height:130px!important}',
+      // wider dashboard and studio on wide screens
+      '@media (min-width:720px){.hmrd{width:min(680px,calc(100vw - 32px))!important}html:not(.hmr-lay-classic) .hmrd:not(.hmrd-moved){bottom:calc(' + BASE + ' + 132px)!important}html:not(.hmr-lay-classic) .hmrd-toast{bottom:calc(' + BASE + ' + 138px)!important}}',
+      '@media (min-width:760px){.hmrs{width:min(1040px,calc(100vw - 32px))!important;margin-left:calc(min(1040px,calc(100vw - 32px)) / -2)!important}}',
+      '.hmrd-row:has(>[data-k="btn-shuffle"]){grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}',
+      '@media (prefers-reduced-motion:reduce){.hmr-pa path{transition:none}}'
+    ].join('');
+    function addCss() { if (!css.parentNode && doc.head) doc.head.appendChild(css); }
+
+    function mountPad() {
+      try {
+        addCss();
+        if (pad.parentNode !== dock) dock.insertBefore(pad, hmrBtn.parentNode === dock ? hmrBtn : null);
+        if (hmrBtn.parentNode !== pad) pad.insertBefore(hmrBtn, pad.firstChild);
+      } catch (e) { }
+    }
+    mountPad(); setInterval(mountPad, 3000);
+    window.addEventListener('pageshow', mountPad);
+
+    // ---- what the arrows do
+    var rm = function () { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } };
+    function maxY() { return Math.max(0, (root.scrollHeight || 0) - innerHeight); }
+    var undoY = null, undoT = 0;
+    function offerUndo(y) {
+      undoY = y; undo.hidden = false; clearTimeout(undoT);
+      undoT = setTimeout(function () { undo.hidden = true; undoY = null; }, 6000);
+    }
+    undo.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+    undo.addEventListener('click', function (e) {
+      e.stopPropagation(); if (undoY === null) return;
+      try { scrollTo({ top: undoY, behavior: rm() ? 'auto' : 'smooth' }); } catch (x) { scrollTo(0, undoY); }
+      undo.hidden = true; undoY = null;
+    });
+    function jump(to) {
+      var y = scrollY;
+      if (Math.abs(y - to) < 40) { toast(to === 0 ? 'You are already at the top.' : 'You are already at the bottom.'); return; }
+      try { scrollTo({ top: to, behavior: rm() ? 'auto' : 'smooth' }); } catch (e) { scrollTo(0, to); }
+      offerUndo(y);
+    }
+    var SECSEL = 'h1,h2,h3,section[id],article,[data-hmr-section]';
+    function sections() {
+      var out = [], seen = [], n = doc.querySelectorAll(SECSEL);
+      for (var i = 0; i < n.length; i++) {
+        var e = n[i];
+        if (e.closest('[data-hmr-dock],[data-hmr-ui],[class^="hmr"],[aria-hidden="true"],nav,footer')) continue;
+        var r = e.getBoundingClientRect(); if (!r.height && !r.width) continue;
+        var y = Math.round(r.top + scrollY);
+        var dup = false; for (var j = 0; j < seen.length; j++) if (Math.abs(seen[j] - y) < 60) { dup = true; break; }
+        if (!dup) { seen.push(y); out.push(y); }
+      }
+      return out.sort(function (a, b) { return a - b; });
+    }
+    function step(dir) {
+      var ys = sections(), y = scrollY, off = 12, t = null, i;
+      if (dir > 0) { for (i = 0; i < ys.length; i++) if (ys[i] - off > y + 8) { t = ys[i] - off; break; } if (t === null) t = Math.min(maxY(), y + innerHeight * 0.85); }
+      else { for (i = ys.length - 1; i >= 0; i--) if (ys[i] - off < y - 8) { t = ys[i] - off; break; } if (t === null) t = Math.max(0, y - innerHeight * 0.85); }
+      t = Math.max(0, Math.min(maxY(), t));
+      if (Math.abs(t - y) < 4) { toast(dir > 0 ? 'This is the end of the page.' : 'This is the start of the page.'); return; }
+      try { scrollTo({ top: t, behavior: rm() ? 'auto' : 'smooth' }); } catch (e) { scrollTo(0, t); }
+    }
+    function tap(d) { if (d === 'up') jump(0); else if (d === 'down') jump(maxY()); else step(d === 'right' ? 1 : -1); }
+    var hold = null;
+    function startHold(d) {
+      if (d === 'left' || d === 'right') { step(d === 'right' ? 1 : -1); hold.iv = setInterval(function () { step(d === 'right' ? 1 : -1); }, 650); return; }
+      var t0 = performance.now(), last = t0, sign = d === 'up' ? -1 : 1;
+      function f(now) {
+        if (!hold) return;
+        var dt = Math.min(50, now - last); last = now;
+        var v = Math.min(2400, 500 + (now - t0) * 1.1);   // px per second, speeding up the longer you hold
+        scrollBy(0, sign * v * dt / 1000);
+        hold.raf = requestAnimationFrame(f);
+      }
+      hold.raf = requestAnimationFrame(f);
+    }
+    function stopHold() {
+      if (!hold) return; var h = hold; hold = null;
+      clearTimeout(h.t); clearInterval(h.iv); if (h.raf) cancelAnimationFrame(h.raf);
+      h.b.classList.remove('on');
+      return h;
+    }
+    DIRS.forEach(function (o) {
+      var b = o.b;
+      b.addEventListener('pointerdown', function (e) {
+        if (e.button !== undefined && e.button !== 0) return;
+        e.stopPropagation(); e.preventDefault();
+        stopHold();
+        hold = { b: b, d: o.d, id: e.pointerId, held: false };
+        b.classList.add('on');
+        try { b.setPointerCapture(e.pointerId); } catch (x) { }
+        hold.t = setTimeout(function () { if (hold && hold.b === b) { hold.held = true; startHold(o.d); } }, 350);
+      });
+      function end(e) {
+        if (!hold || hold.b !== b || (e && e.pointerId !== hold.id)) return;
+        var h = stopHold();
+        if (h && !h.held && e && e.type === 'pointerup') tap(o.d);
+      }
+      b.addEventListener('pointerup', end); b.addEventListener('pointercancel', end); b.addEventListener('lostpointercapture', end);
+      b.addEventListener('click', function (e) { if (e.detail === 0) tap(o.d); });   // keyboard: Enter or Space
+      b.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+    });
+    window.addEventListener('blur', stopHold);
+
+    // ---- layouts and the shuffle
+    function applyLayout(id, say) {
+      cur = id; lset(id); setCls();
+      try { if (window.__hmrResetButtons) window.__hmrResetButtons(); } catch (e) { }
+      if (say) toast('Button layout: ' + lay(id).name + '. ' + lay(id).hint + '.', null, 4000);
+    }
+    function shuffle() { var i = 0; for (var k = 0; k < LAYS.length; k++) if (LAYS[k].id === cur) i = k; applyLayout(LAYS[(i + 1) % LAYS.length].id, true); }
+    // dashboard: a "Shuffle buttons" action in the Right now row, and the layouts in Your settings
+    function addDashItems() {
+      try {
+        var row = doc.querySelector('.hmrd-row');
+        if (row && !row.querySelector('[data-k="btn-shuffle"]')) {
+          var a = row.querySelector('[data-k="share"]') || row.firstElementChild;
+          if (a) {
+            var s = a.cloneNode(true); s.setAttribute('data-k', 'btn-shuffle'); s.classList.remove('on');
+            var ic = s.querySelector('.ic'); if (ic) ic.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>';
+            var lb = s.querySelector('span:not(.ic)'); if (lb) lb.textContent = 'Shuffle'; else s.appendChild(doc.createTextNode('Shuffle'));
+            s.setAttribute('aria-label', 'Shuffle the button layout. Now: ' + lay(cur).name);
+            s.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); shuffle(); s.setAttribute('aria-label', 'Shuffle the button layout. Now: ' + lay(cur).name); });
+            row.appendChild(s);
+          }
+        }
+        var ra = doc.querySelector('[data-k="reset-all"]');
+        if (ra && ra.parentNode && !ra.parentNode.querySelector('[data-k="lay-joy"]')) {
+          LAYS.forEach(function (l) {
+            var it = ra.cloneNode(true); it.setAttribute('data-k', 'lay-' + l.id);
+            var bb = it.querySelector('b'), sm = it.querySelector('small');
+            if (bb) bb.textContent = 'Button layout: ' + l.name + (l.id === cur ? ' (on)' : '');
+            if (sm) sm.textContent = l.hint;
+            it.addEventListener('click', function () {
+              applyLayout(l.id, true);
+              var all = ra.parentNode.querySelectorAll('[data-k^="lay-"]');
+              for (var i = 0; i < all.length; i++) { var x = all[i].querySelector('b'), L = lay(all[i].getAttribute('data-k').slice(4)); if (x) x.textContent = 'Button layout: ' + L.name + (L.id === cur ? ' (on)' : ''); }
+            });
+            ra.parentNode.insertBefore(it, ra);
+          });
+        }
+      } catch (e) { }
+    }
+    var dT = 0;
+    try { new MutationObserver(function () { if (!dT) dT = setTimeout(function () { dT = 0; addDashItems(); }, 120); }).observe(doc.documentElement, { childList: true, subtree: true }); } catch (e) { }
+    window.__hmrLayout = { list: LAYS, get: function () { return cur; }, set: function (id) { applyLayout(lay(id).id, false); }, shuffle: shuffle };
+  })();
+
   window.HMRDock = {
     site: CFG.site, effects: EFFECTS.map(function (e) { return e.name; }),
     funsies: function (name) { if (effByName(name)) runEffect(name); },
     openFunsies: openFz, closeFunsies: function () { closeFz(true); }, play: function (id) { PLAY.forEach(function (p) { if (p.id === id) openPlay(p); }); }, closePlay: function () { closePlay(true); },
     stopFunsies: function () { stopFunsies(true); }, log: readLog, openReact: openRx, closeReact: function () { closeRx(true); },
     send: send, mailto: mailSelf, openFeedback: function (o) { openSheet('feedback', o); }, openLost: function () { openSheet('lost'); }, closeFeedback: function () { closeSheet(true); }, openSpeak: openSpeak, closeSpeak: function () { closeSpeak(true, true); },
-    highlights: hlList, clearHighlights: clearAllHighlights, design: function () { return JSON.parse(JSON.stringify(dx)); }, version: 6.41, design: { theme: function (s) { return genTheme(s); }, palettes: function () { return PALS; }, famOf: famOfSeed, seedIn: seedIn, show: function (s) { goTheme('g:' + s); }, hide: function () { goTheme(defaultId()); }, stats: function () { return gen ? { ms: gen.ms || 0, frames: gen.frames || 0, id: gen.t && gen.t.id, layouts: LAYS.length, palettes: PALS.length, fonts: FONTS.length, cards: CARDS.length } : null; }, count: function (fam) { return LAYS.length * PALS.length * FONTS.length * CARDS.length * 5 * DENKEYS.length * RADII.length * ACCS.length; } }, themes: function () { return allThemes().map(function (t) { return { id: t.id, name: t.name, genre: GENRES[t.gi].n, b: t.b, bi: t.bi, f: t.f, h: t.h, l: t.l, c: t.c }; }); }
+    highlights: hlList, clearHighlights: clearAllHighlights, version: 6.5, openDash: function (v) { loadDash(function () { window.HMRDash.open(v); }); }, openStudio: function (t) { loadDash(function () { window.HMRDash.studio(t); }); }, closeOthers: closeOthers, designPanel: function () { return buildDx(null); }, design: { theme: function (s) { return genTheme(s); }, palettes: function () { return PALS; }, famOf: famOfSeed, seedIn: seedIn, show: function (s) { goTheme('g:' + s); }, hide: function () { goTheme(defaultId()); }, stats: function () { return gen ? { ms: gen.ms || 0, frames: gen.frames || 0, id: gen.t && gen.t.id, layouts: LAYS.length, palettes: PALS.length, fonts: FONTS.length, cards: CARDS.length } : null; }, count: function (fam) { return LAYS.length * PALS.length * FONTS.length * CARDS.length * 5 * DENKEYS.length * RADII.length * ACCS.length; } }, themes: function () { return allThemes().map(function (t) { return { id: t.id, name: t.name, genre: GENRES[t.gi].n, b: t.b, bi: t.bi, f: t.f, h: t.h, l: t.l, c: t.c }; }); }
   };
+})();
+
+/* HMR dock v6.6.0 edit mode: "Add a demo?" cards (Leo, Nov 25: the HMR sites are in edit mode by him).
+   On each page the dock finds spots where a demo could help (forms, tools, sections with controls) that have no demo yet, and puts a small square
+   card at the spot's top right: "Add a demo?" with Yes and No. An answer is sent with the dock's send() (kind 'demo', page, spot name) and the card
+   goes away on this device (localStorage 'hmr-demo-ans'). Turn off: EDIT_MODE = false below, ?edit=0 in the address, or localStorage 'hmr-edit-off' = '1'.
+   A page can mark a spot with data-demo-spot="Name", or opt out with data-demo="none". */
+(function () {
+  'use strict';
+  var EDIT_MODE = true, MAX = 8, KEY = 'hmr-demo-ans', doc = document;
+  if (!EDIT_MODE || window.__hmrDemoSpots) return; window.__hmrDemoSpots = 1;
+  function lg(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function ls(k, v) { try { localStorage.setItem(k, v); } catch (e) { } }
+  if (/[?&]edit=0\b/.test(location.search) || lg('hmr-edit-off') === '1') return;
+  var answered = {}; try { answered = JSON.parse(lg(KEY) || '{}') || {}; } catch (e) { answered = {}; }
+  var SKIPIN = '#hmr-dock,[class^="hmr-"],[class*=" hmr-"],[id^="hmr-"],nav,header,footer,[role="dialog"],dialog,[aria-hidden="true"]';
+  var HASDEMO = '[data-demo="none"],.demo,[id*="demo" i],[class*="demo" i],video,iframe[src*="youtube"],iframe[src*="vimeo"]';
+  var layer = null, cards = [];
+  function css() {
+    var s = doc.createElement('style'); s.id = 'hmr-demo-css';
+    s.textContent = '.hmr-demo-layer{position:absolute;top:0;left:0;width:0;height:0;z-index:9990}' +
+      '.hmr-demo{position:absolute;width:104px;min-height:96px;box-sizing:border-box;padding:8px;border:2px dashed #b8860b;border-radius:10px;background:#fff8d6;color:#2a2508;font:600 13px/1.25 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,.18);display:flex;flex-direction:column;justify-content:space-between;gap:6px}' +
+      '.hmr-demo .q{display:block}.hmr-demo .r{display:flex;gap:6px;justify-content:center}' +
+      '.hmr-demo button{flex:1;min-height:30px;padding:4px 0;border:1px solid #6b5a10;border-radius:6px;background:#fff;color:#2a2508;font:600 13px system-ui,sans-serif;cursor:pointer}' +
+      '.hmr-demo button:hover,.hmr-demo button:focus-visible{background:#f5c518;outline:2px solid #2a2508;outline-offset:1px}' +
+      '.hmr-demo .ok{font-weight:500}@media print{.hmr-demo-layer{display:none}}';
+    (doc.head || doc.documentElement).appendChild(s);
+  }
+  function txt(e) { return String((e && (e.textContent || '')) || '').replace(/\s+/g, ' ').trim(); }
+  function nameOf(sp, i) {
+    var n = sp.getAttribute('data-demo-spot') || sp.getAttribute('aria-label');
+    if (!n) { var h = sp.querySelector('h1,h2,h3,h4,legend,label'); n = txt(h); }
+    if (!n && sp.id) n = '#' + sp.id;
+    if (!n) n = sp.tagName.toLowerCase() + ' ' + (i + 1);
+    return n.length > 60 ? n.slice(0, 57) + '...' : n;
+  }
+  function skipped(e) { for (var n = e; n && n !== doc.body && n !== doc.documentElement; n = n.parentElement) if (n.matches(SKIPIN)) return true; return false; }   // v6.6.1: html and body carry hmr- classes (pointer prefs), so they are not tested
+  function visible(e) { var r = e.getBoundingClientRect(); return r.width >= 220 && r.height >= 90; }
+  function find() {
+    var cand = [].slice.call(doc.querySelectorAll('[data-demo-spot],form,section,article')), out = [];
+    cand.forEach(function (sp) {
+      if (out.length >= MAX) return;
+      if (skipped(sp)) return;
+      if (!sp.hasAttribute('data-demo-spot') && !sp.querySelector('input:not([type=hidden]),textarea,select,canvas,button')) return;
+      if (sp.matches(HASDEMO) || sp.querySelector(HASDEMO)) return;
+      if (!visible(sp)) return;
+      for (var i = 0; i < out.length; i++) if (out[i].contains(sp) || sp.contains(out[i])) return;   // one card per area
+      out.push(sp);
+    });
+    return out;
+  }
+  function place(c) {
+    var r = c.sp.getBoundingClientRect(), x = r.right + scrollX - 112, y = r.top + scrollY + 8;
+    c.el.style.left = Math.max(8, x) + 'px'; c.el.style.top = Math.max(8, y) + 'px';
+    c.el.style.display = (r.width || r.height) ? '' : 'none';
+  }
+  function answer(c, yes) {
+    var site = (window.HMRDock && window.HMRDock.site) || location.hostname, ans = yes ? 'YES' : 'NO';
+    c.el.innerHTML = '<span class="ok">Sending...</span>';
+    var done = function (ok) {
+      if (ok) { answered[c.key] = ans; ls(KEY, JSON.stringify(answered)); c.el.innerHTML = '<span class="ok">' + (yes ? 'Yes, noted. Thank you.' : 'No, noted. Thank you.') + '</span>'; setTimeout(function () { c.el.remove(); }, 1600); }
+      else { build(c); var e = doc.createElement('span'); e.className = 'ok'; e.textContent = 'Not sent. Try again.'; c.el.insertBefore(e, c.el.firstChild); }
+    };
+    if (!window.HMRDock || !window.HMRDock.send) return done(false);
+    window.HMRDock.send({ kind: 'demo', subject: 'HMR site, demo spot: ' + site, noMailto: true,
+      message: 'Add a demo here? ' + ans + '\nSpot: ' + c.name + '\nPage: ' + location.pathname,
+      details: { answer: ans, spot: c.name, path: location.pathname } }).then(function (r) { done(r && r.ok); }, function () { done(false); });
+  }
+  function build(c) {
+    c.el.innerHTML = '';
+    var q = doc.createElement('span'); q.className = 'q'; q.textContent = 'Add a demo?'; c.el.appendChild(q);
+    var row = doc.createElement('span'); row.className = 'r';
+    [['Yes', true], ['No', false]].forEach(function (b) {
+      var bt = doc.createElement('button'); bt.type = 'button'; bt.textContent = b[0];
+      bt.setAttribute('aria-label', b[0] + ', add a demo to ' + c.name);
+      if (!b[1]) bt.setAttribute('aria-label', 'No demo needed for ' + c.name);
+      bt.addEventListener('click', function () { answer(c, b[1]); }); row.appendChild(bt);
+    });
+    c.el.appendChild(row);
+  }
+  function run() {
+    var spots = find(); if (!spots.length) return;
+    css(); layer = doc.createElement('div'); layer.className = 'hmr-demo-layer'; doc.body.appendChild(layer);
+    spots.forEach(function (sp, i) {
+      var name = nameOf(sp, i), key = location.pathname + '|' + name;
+      if (answered[key]) return;
+      var e = doc.createElement('div'); e.className = 'hmr-demo'; e.setAttribute('role', 'group'); e.setAttribute('aria-label', 'Add a demo to ' + name + '?');
+      var c = { sp: sp, el: e, name: name, key: key }; build(c); layer.appendChild(e); cards.push(c); place(c);
+    });
+    var re = function () { cards.forEach(function (c) { if (c.el.isConnected) place(c); }); };
+    addEventListener('resize', re); setInterval(re, 2000);
+    window.HMRDemoSpots = { list: function () { return cards.map(function (c) { return c.name; }); }, reset: function () { ls(KEY, '{}'); } };
+  }
+  if (doc.readyState === 'complete') setTimeout(run, 600); else addEventListener('load', function () { setTimeout(run, 600); });
 })();
